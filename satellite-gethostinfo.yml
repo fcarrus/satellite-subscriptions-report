@@ -12,9 +12,6 @@
     validate_certs: false
   register: sat_hostinfo
 
-# - set_fact:
-#     sat_hostinfo: "{{ sat_hostinfo.json }}"
-
 - name: Get Subscriptions Info for all hosts
   local_action: uri
   args:
@@ -31,10 +28,13 @@
     - 400
   register: sat_subinfo
 
-# - name: Select only Red Hat subscriptions
-#   set_fact:
-#     sat_subinfo: "{{ sat_subinfo.json.results | default([]) | selectattr('upstream', 'defined') | selectattr('upstream') | default([]) | list }}"
-
+- name: Ensure cache directory exists
+  local_action: file
+  args:
+    path: "{{ hosts_cache_dir }}"
+    state: directory
+  run_once: true
+  
 - name: Save hosts cache file
   local_action: copy
   args:

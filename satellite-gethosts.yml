@@ -1,5 +1,4 @@
 ---
-# tasks file for satellite-gethosts
 
 - when: 'satellite_hosts_search_query is defined'
   block:
