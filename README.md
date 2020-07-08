@@ -18,7 +18,10 @@ Use the [satellite-vars.yml.example] file to create your own `satellite-vars.yml
 
 Run the playbook with your query of choice:
 
-`$ ansible-playbook main.yml -e satellite_hosts_search_query="' os_title \!~ centos or hypervisor = true '"`
+```
+$ ansible-playbook main.yml \
+    -e satellite_hosts_search_query="' os_title \!~ centos or hypervisor = true '
+```
 
 *(based on your Bash version, you might or might not need that extra backslash before the exclamation mark)*
 
