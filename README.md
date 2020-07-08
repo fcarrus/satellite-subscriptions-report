@@ -10,11 +10,13 @@ This Ansible playbook queries the Satellite's *Hosts* API with your filter of ch
 
 The data is then used to compile the HTML report. For each playbook run with a different query, the results are added to the final report.
 
+The playbook never makes logins to the Hosts.
+
 ## How to use it
 
-The best use for this playbook is to be run from the Satellite server itself. It does not make use of the Foreman Ansible modules.
+The best use for this playbook is to be run from the Satellite server itself. It does not make use of the Foreman Ansible modules. But it makes full use of Ansible's multithreaded task execution, so be sure to crank up your `forks` in your `ansible.cfg`.
 
-Use the [satellite-vars.yml.example] file to create your own `satellite-vars.yml` file. You should set your Satellite's URL and credentials with read access to hosts and subscriptions (i.e. the *Viewer* role).
+Use the [satellite-vars.yml.example](./satellite-vars.yml.example) file to create your own `satellite-vars.yml` file. You should set your Satellite's URL and credentials with read access to hosts and subscriptions (i.e. the *Viewer* role).
 
 Run the playbook with your query of choice:
 
@@ -40,3 +42,6 @@ Each hyperlink brings you to a handy page where to apply modifications, i.e.:
 - A host's FQDN with subscriptions: to the List/Remove Subscriptions page
 - A Subscription's name: to the Subscription Info page
 
+## TODO
+
+* A CSV report maybe
