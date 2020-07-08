@@ -1,0 +1,48 @@
+
+- name: Get Host Info for all hosts
+  local_action: uri
+  args:
+    url: "{{ satellite_gethosts_url }}/{{ sat_host_id }}"
+    force_basic_auth: true
+    user: "{{ satellite_user }}"
+    body_format: json
+    password: "{{ satellite_password }}"
+    method: GET
+    return_content: true
+    validate_certs: false
+  register: sat_hostinfo
+
+# - set_fact:
+#     sat_hostinfo: "{{ sat_hostinfo.json }}"
+
+- name: Get Subscriptions Info for all hosts
+  local_action: uri
+  args:
+    url: "{{ satellite_gethosts_url }}/{{ sat_host_id }}/subscriptions?per_page=9999"
+    force_basic_auth: true
+    user: "{{ satellite_user }}"
+    body_format: json
+    password: "{{ satellite_password }}"
+    method: GET
+    return_content: true
+    validate_certs: false
+    status_code: 
+    - 200
+    - 400
+  register: sat_subinfo
+
+# - name: Select only Red Hat subscriptions
+#   set_fact:
+#     sat_subinfo: "{{ sat_subinfo.json.results | default([]) | selectattr('upstream', 'defined') | selectattr('upstream') | default([]) | list }}"
+
+- name: Save hosts cache file
+  local_action: copy
+  args:
+    dest: "{{ hosts_cache_dir }}/{{ sat_host_id }}.json"
+    content: |
+      {
+        "sat_subinfo":  {{ sat_subinfo.json.results | default([]) | selectattr('upstream', 'defined') | selectattr('upstream') | default([]) | list | to_json }},
+        "sat_hostinfo": {{ sat_hostinfo.json | to_json }},
+        "sat_host_id":  {{ sat_host_id }},
+      }
+

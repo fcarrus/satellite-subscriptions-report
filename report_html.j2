@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>Satellite Subscriptions Report</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function () {
+  $('#dtSubscriptions').DataTable({ "paging": false });
+  $('.dataTables_length').addClass('bs-select');
+});
+</script>
+<style>
+th, td { padding: 3px; text-align: left; vertical-align: top;}
+td.nosub { font-style: italic;}
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+  bottom: .5em;
+}
+</style>
+
+</head>
+<body>
+<table id="dtSubscriptions" class="table table-striped table-bordered table-sm small">
+  <thead>
+    <tr>
+        <th scope="col">Host</th>
+        <th scope="col">Virtual</th>
+        <th scope="col">Guest of</th>
+        <th scope="col">Subscription</th>
+        <th scope="col">Qty</th>
+        <th scope="col">Contract</th>
+        <th scope="col">End date</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for host_cache_file in host_cache_files.files -%}
+{%   set host_cache = lookup('file', host_cache_file.path) | from_json -%}
+{%   set virtual_type = host_cache.sat_hostinfo.subscription_facet_attributes.host_type 
+        if ('subscription_facet_attributes' in host_cache.sat_hostinfo 
+          and host_cache.sat_hostinfo.subscription_facet_attributes.host_type) 
+        else "virtual" if ('subscription_facet_attributes' in host_cache.sat_hostinfo 
+          and host_cache.sat_hostinfo.subscription_facet_attributes.virtual_host)
+        else "" -%}
+{%   set virtual_host = '<a href="'+satellite_contenthosts_url+'/'+ (host_cache.sat_hostinfo.subscription_facet_attributes.virtual_host.id|string) +'/subscriptions">'+host_cache.sat_hostinfo.subscription_facet_attributes.virtual_host.name+'</a>'
+        if ('subscription_facet_attributes' in host_cache.sat_hostinfo 
+          and host_cache.sat_hostinfo.subscription_facet_attributes.virtual_host 
+          and 'name' in host_cache.sat_hostinfo.subscription_facet_attributes.virtual_host) 
+        else ""  -%}
+{%   if host_cache.sat_subinfo | length > 0 -%}
+
+{%     for sub in host_cache.sat_subinfo -%}
+    <tr>
+        <td>
+           <a href="{{ satellite_contenthosts_url }}/{{ host_cache.sat_host_id }}/subscriptions">{{ host_cache.sat_hostinfo.name }}</a> {{ ((loop.index|string)+"/"+(loop.length|string)) if loop.length > 1 else "" }}<br>
+           <span style="font-size: 11px; white-space: nowrap;">{{ host_cache.sat_hostinfo.subscription_facet_attributes.uuid if 'subscription_facet_attributes' in host_cache.sat_hostinfo else "unregistered" }}</span>
+        </td>
+        <td>{{ virtual_type }}</td>
+        <td>{{ virtual_host }}</td>
+        <td>
+          <a href="{{ satellite_url }}/katello/api/subscriptions/{{ sub.id }}">{{ sub.product_id }} - 
+          {{ sub.product_name }} ({{ sub.consumed }}/{{ "&infin;" if (sub.quantity and sub.quantity < 0) else sub.quantity if sub.quantity else "err" }})
+          </a></td>
+        <td>{{ sub.quantity_consumed }}</td>
+        <td>{{ sub.contract_number }}</td>
+        <td>{{ sub.end_date[0:10] }}</td>
+    </tr>
+
+{%     endfor -%}
+
+{%   else  -%}
+
+    <tr>
+        <td>
+           <a href="{{ satellite_contenthosts_url }}/{{ host_cache.sat_host_id }}/add-subscriptions?subscriptionSearch=has%20contract&page=1&per_page=100&sortOrder=ASC">{{ host_cache.sat_hostinfo.name }}</a><br>
+           <span style="font-size: 11px; white-space: nowrap;">{{ host_cache.sat_hostinfo.subscription_facet_attributes.uuid if 'subscription_facet_attributes' in host_cache.sat_hostinfo else "unregistered" }}</span>        </td>
+        <td>{{ virtual_type }}</td>
+        <td>{{ virtual_host }}</td>
+        <td class="nosub">-- no sub</td>
+        <td></td>
+        <td></td>
+        <td></td>
+
+{%   endif -%}
+
+{% endfor -%}
+  </tbody>
+</body>

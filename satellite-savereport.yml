@@ -1,0 +1,14 @@
+- name: Find all cache files
+  find:
+    paths: 
+    - "{{ hosts_cache_dir }}"
+    patterns:
+    - "*.json"
+  register: host_cache_files
+
+- name: Save HTML report
+  template:
+    dest: "{{ satellite_output_html }}"
+    src: report_html.j2
+    unsafe_writes: true
+  when: 'satellite_output_html is defined'

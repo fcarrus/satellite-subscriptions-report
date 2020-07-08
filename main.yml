@@ -1,0 +1,29 @@
+- name: Subscriptions Info
+  hosts: localhost
+  become: false
+  gather_facts: false
+  vars_files: 
+  - satellite-vars.yml
+  tasks:
+
+  - include_tasks: satellite-gethosts.yml
+
+- name: Process Hosts
+  hosts: sat_hosts
+  become: false
+  gather_facts: false
+  vars_files: 
+  - satellite-vars.yml
+  tasks:
+  
+  - include_tasks: satellite-gethostinfo.yml
+
+- name: Save Output Reports
+  hosts: localhost
+  become: false
+  gather_facts: false
+  vars_files: 
+  - satellite-vars.yml
+  tasks:
+
+  - include_tasks: satellite-savereport.yml

@@ -1,0 +1,29 @@
+---
+
+# Fill in your Satellite info
+satellite_url: https://satellite.fcarrus.it
+satellite_user: admin
+satellite_password: Passw0rd
+
+
+# These are commonly used URLs throughout the playbooks
+satellite_gethosts_url: "{{ satellite_url }}/api/hosts"
+satellite_contenthosts_url: "{{ satellite_url }}/content_hosts"
+
+
+# Common queries
+# All physical systems (except CentOS), including hypervisors
+#satellite_hosts_search_query: "(facts.virtual = physical and os_title !~ centos) or hypervisor = true"
+
+# All virtual and physical systems (except CentOS)
+#satellite_hosts_search_query: "os_title !~ centos or hypervisor = true"
+
+# Hypervisors only
+#satellite_hosts_search_query: "hypervisor = true"
+
+# Where to output your HTML report. A handy place could be your Satellite's /var/www/html/pub directory.
+satellite_output_html: "./subscriptions-report.html"
+
+# Where to cache your systems' host data. Set this to a non-world readable directory.
+hosts_cache_dir: "./cache"
+

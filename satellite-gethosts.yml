@@ -1,0 +1,26 @@
+---
+# tasks file for satellite-gethosts
+
+- when: 'satellite_hosts_search_query is defined'
+  block:
+
+  - name: Get Hosts List
+    uri:
+      url: "{{ satellite_gethosts_url }}?search={{ satellite_hosts_search_query | urlencode }}&thin=true&per_page=99999"
+      force_basic_auth: true
+      user: "{{ satellite_user }}"
+      body_format: json
+      password: "{{ satellite_password }}"
+      method: GET
+      return_content: true
+      validate_certs: false
+    register: sat_hostlist
+
+  - name: Add Hosts
+    add_host:
+      name: "{{ newhost.name }}"
+      sat_host_id: "{{ newhost.id }}" 
+      groups: sat_hosts
+    loop: "{{ sat_hostlist.json.results }}"
+    loop_control:
+      loop_var: newhost
