@@ -24,7 +24,9 @@ Run the playbook with your query of choice:
 
 You can run the playbook multiple times with different queries, and since the previous query results are cached, the results are *added* to the new report.
 
-To clean up the cache, simply remove all `.json` files from the *cache* directory.
+If you run it with the same query twice, those hosts' data is refreshed.
+
+To clean up all the cache, simply remove all `.json` files from the *cache* directory.
 
 ## The Report
 
